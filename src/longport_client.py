@@ -123,10 +123,11 @@ class LongportClient:
             chain_info = self.ctx.option_chain_info_by_date(symbol, expiry_date_obj)
             self._has_option_permission = True
             self._last_error = None
+            print(f"[DEBUG] {symbol} chain_info: {len(chain_info) if chain_info else 0} items")
         except Exception as e:
             error_msg = str(e)
             self._last_error = error_msg
-            print(f"Error getting option chain info: {error_msg}")
+            print(f"[DEBUG] Error getting option chain info for {symbol}: {error_msg}")
             
             if "do not have access" in error_msg.lower() or "purchase" in error_msg.lower():
                 self._has_option_permission = False
@@ -134,6 +135,7 @@ class LongportClient:
             return pd.DataFrame()
         
         if not chain_info:
+            print(f"[DEBUG] {symbol}: chain_info is empty")
             return pd.DataFrame()
         
         # Extract option symbols from chain_info
@@ -147,10 +149,10 @@ class LongportClient:
             # Also extract strike price if available
         
         if not option_symbols:
-            print("No option symbols found in chain info")
+            print(f"[DEBUG] {symbol}: No option symbols found in chain info")
             return pd.DataFrame()
         
-        print(f"Found {len(option_symbols)} option symbols")
+        print(f"[DEBUG] {symbol}: Found {len(option_symbols)} option symbols")
         
         # Get quotes for all options
         try:

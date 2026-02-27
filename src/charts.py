@@ -353,3 +353,102 @@ def create_metrics_cards(result: WeightedAverageResult, symbol: str) -> str:
     </div>
     """
     return html
+
+
+def create_oi_trend_chart(
+    trend_data: pd.DataFrame,
+    symbol: str,
+    spot_price: float,
+    height: int = 600
+) -> go.Figure:
+    """
+    Create OI trend chart showing Call WgtAvg, Put WgtAvg, All WgtAvg over expiry dates
+    
+    Args:
+        trend_data: DataFrame with columns ['expiry_date', 'call_wgt_avg', 'put_wgt_avg', 'all_wgt_avg']
+        symbol: Stock symbol
+        spot_price: Current spot price
+        height: Chart height in pixels
+    
+    Returns:
+        Plotly Figure object
+    """
+    fig = go.Figure()
+    
+    # Add Call WgtAvg line - green
+    fig.add_trace(go.Scatter(
+        x=trend_data['expiry_date'],
+        y=trend_data['call_wgt_avg'],
+        mode='lines+markers',
+        name='Call WgtAvg',
+        line=dict(color='green', width=3),
+        marker=dict(size=8, symbol='circle'),
+        hovertemplate='到期日: %{x}<br>Call WgtAvg: %{y:.2f}<extra></extra>'
+    ))
+    
+    # Add Put WgtAvg line - red
+    fig.add_trace(go.Scatter(
+        x=trend_data['expiry_date'],
+        y=trend_data['put_wgt_avg'],
+        mode='lines+markers',
+        name='Put WgtAvg',
+        line=dict(color='red', width=3),
+        marker=dict(size=8, symbol='circle'),
+        hovertemplate='到期日: %{x}<br>Put WgtAvg: %{y:.2f}<extra></extra>'
+    ))
+    
+    # Add All WgtAvg line - dark red/brown
+    fig.add_trace(go.Scatter(
+        x=trend_data['expiry_date'],
+        y=trend_data['all_wgt_avg'],
+        mode='lines+markers',
+        name='All WgtAvg',
+        line=dict(color='darkred', width=3, dash='dash'),
+        marker=dict(size=8, symbol='diamond'),
+        hovertemplate='到期日: %{x}<br>All WgtAvg: %{y:.2f}<extra></extra>'
+    ))
+    
+    # Add Spot price horizontal line - purple
+    fig.add_trace(go.Scatter(
+        x=[trend_data['expiry_date'].iloc[0], trend_data['expiry_date'].iloc[-1]],
+        y=[spot_price, spot_price],
+        mode='lines',
+        name=f'Spot {symbol}: {spot_price:.2f}',
+        line=dict(color='purple', width=2, dash='dot'),
+        hoverinfo='skip'
+    ))
+    
+    # Update layout
+    fig.update_layout(
+        title=f"{symbol} OI 走势图 (加权平均价趋势)",
+        xaxis_title="到期日",
+        yaxis_title="Strike Price",
+        height=height,
+        template='plotly_white',
+        legend=dict(
+            orientation="v",
+            yanchor="top",
+            y=0.98,
+            xanchor="left",
+            x=0.01,
+            bgcolor="rgba(255, 255, 255, 0.9)",
+            bordercolor="rgba(0, 0, 0, 0.2)",
+            borderwidth=1,
+            font=dict(size=12)
+        ),
+        margin=dict(r=50, t=80, b=80),
+        hovermode='x unified'
+    )
+    
+    # Format x-axis
+    fig.update_xaxes(
+        tickangle=45,
+        type='category'
+    )
+    
+    # Format y-axis
+    fig.update_yaxes(
+        tickformat='.2f'
+    )
+    
+    return fig
