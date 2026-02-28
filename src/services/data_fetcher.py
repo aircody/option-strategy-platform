@@ -125,9 +125,10 @@ class DataFetcher:
         """Fetch trend data for multiple expiry dates"""
         trend_data = []
 
+        total_dates = len(expiry_dates)
         for i, expiry_date in enumerate(expiry_dates):
             if progress_callback:
-                progress_callback(i, len(expiry_dates))
+                progress_callback(i + 1, total_dates)
 
             try:
                 # Get stock quote
@@ -160,6 +161,6 @@ class DataFetcher:
                     st.warning(f"{expiry_date}: 获取数据失败 - {error_msg}")
 
         if progress_callback:
-            progress_callback(len(expiry_dates), len(expiry_dates))
+            progress_callback(total_dates, total_dates)
 
         return trend_data

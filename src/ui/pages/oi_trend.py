@@ -127,7 +127,8 @@ def _fetch_and_display_trend_data(symbol: str, selected_dates: list, request_del
             progress_bar = st.progress(0)
 
             def progress_callback(current, total):
-                progress_bar.progress((current + 1) / total)
+                progress = min(current / total, 1.0) if total > 0 else 0.0
+                progress_bar.progress(progress)
 
             trend_data = fetcher.fetch_trend_data(
                 symbol,

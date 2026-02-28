@@ -218,7 +218,7 @@ def _render_batch_query_section():
         expiry_date_str = expiry_date.strftime("%Y-%m-%d")
 
         st.markdown("<br>", unsafe_allow_html=True)
-        delay = st.slider("请求间隔(秒)", min_value=1, max_value=5, value=2,
+        delay = st.slider("请求间隔(秒)", min_value=1, max_value=60, value=2,
                         help="为避免API限流，设置每个股票之间的请求间隔")
 
     with col3:
